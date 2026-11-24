@@ -2,7 +2,8 @@ import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 
 import { Order } from "../models/order.js";
-import { populate } from "dotenv";
+import { OrderItem } from "../models/order-item.js";
+import { Product } from "../models/product.js";
 
 const router = express.Router();
 
@@ -35,6 +36,58 @@ router.get("/:id", async (req: Request, res: Response) => {
 
   if (!order) return res.status(404).json({ message: "Order not found" });
   return res.status(200).json(order);
+});
+
+// POST create order & calculate totalPrice securely on backend
+router.post("/", async (req: Request, res: Response) => {
+  try {
+    let itemsInput: OrderItemInput[] = req.body.orderItems;
+
+    const orderItemIds = await Promise.all(
+      itemsInput.map(async (item) => {
+        let newOrderItem = new OrderItem({
+          quantity: item.quantity,
+          product: item.product,
+        });
+
+        newOrderItem = await newOrderItem.save();
+        return newOrderItem.id;
+      }),
+    );
+
+    const itemPrices = await Promise.all(
+      itemsInput.map(async (item) => {
+        let product = await Product.findById(item.product);
+        if (!product) {
+          throw new Error(`Product ${item.product} not found`);
+        }
+
+        return product.price * item.quantity;
+      }),
+    );
+
+    const totalPrice = itemPrices.reduce((acc, price) => acc + price, 0);
+
+    let order = new Order({
+      orderItems: orderItemIds,
+      shippingAddress1: req.body.shippingAddress1,
+      shippingAddress2: req.body.shippingAddress2,
+      city: req.body.city,
+      zip: req.body.zip,
+      country: req.body.country,
+      phone: req.body.phone,
+      status: req.body.status || "Pending",
+      totalPrice,
+      user: req.body.user,
+    });
+
+    order = await order.save();
+    return res.status(201).json(order);
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: "Order could not be created", error });
+  }
 });
 
 export default router;
