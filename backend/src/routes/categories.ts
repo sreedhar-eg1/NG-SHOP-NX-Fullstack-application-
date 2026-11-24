@@ -47,4 +47,27 @@ router.post("/", async (req: Request, res: Response) => {
   }
 });
 
+// PUT update category
+router.put("/:id", async (req: Request, res: Response) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "Invalid Category ID" });
+  }
+
+  let category = Category.findByIdAndUpdate(
+    req.params.id,
+    {
+      name: req.body.name,
+      icon: req.body.icon,
+      color: req.body.color,
+    },
+    { new: true }, // return the updated document instead of old one
+  );
+
+  if (!category) {
+    return res.status(400).json({ message: "Category not found" });
+  }
+
+  return res.status(200).json(category);
+});
+
 export default router;
