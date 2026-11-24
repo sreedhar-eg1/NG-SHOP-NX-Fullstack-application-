@@ -53,7 +53,7 @@ router.put("/:id", async (req: Request, res: Response) => {
     return res.status(400).json({ message: "Invalid Category ID" });
   }
 
-  let category = Category.findByIdAndUpdate(
+  let category = await Category.findByIdAndUpdate(
     req.params.id,
     {
       name: req.body.name,
@@ -68,6 +68,27 @@ router.put("/:id", async (req: Request, res: Response) => {
   }
 
   return res.status(200).json(category);
+});
+
+// DELETE category
+router.delete("/:id", async (req: Request, res: Response) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "Invalid Category ID" });
+  }
+
+  try {
+    const category = await Category.findByIdAndDelete(req.params.id);
+
+    if (!category) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Category not found" });
+    }
+
+    return res.status(200).json({ success: true, message: "Category deleted" });
+  } catch (error) {
+    return res.status(500).json({ success: false, error });
+  }
 });
 
 export default router;
