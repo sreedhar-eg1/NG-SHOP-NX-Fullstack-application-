@@ -1,7 +1,8 @@
 import express, { Request, Response } from "express";
 import multer from "multer";
-import { Product } from "../models/product.js";
 import mongoose from "mongoose";
+
+import { Product } from "../models/product.js";
 import { Category } from "../models/category.js";
 
 const router = express.Router();
@@ -97,6 +98,60 @@ router.post(
       return res
         .status(500)
         .json({ message: "Product could not be created", error });
+    }
+  },
+);
+
+// PUT update product
+router.put(
+  "/:id",
+  uploadOptions.single("image"),
+  async (req: Request, res: Response) => {
+    try {
+      if (!mongoose.isValidObjectId(req.params.id)) {
+        return res.status(400).json({ message: "Invalid Product ID" });
+      }
+
+      const category = await Category.findById(req.body.category);
+      if (!category) {
+        return res.status(400).json({ message: "Invalid Category" });
+      }
+
+      const existingProduct = await Product.findById(req.params.id);
+      if (!existingProduct) {
+        return res.status(400).json({ message: "Product not found" });
+      }
+
+      const file = req.file;
+      const basePath = `${req.protocol}://${req.get("host")}/public/uploads/`;
+      const imagePath = file
+        ? `${basePath}/${file.filename}`
+        : existingProduct.image;
+
+      const updatedProduct = await Product.findByIdAndUpdate(
+        req.params.id,
+        {
+          name: req.body.name,
+          description: req.body.description,
+          richDescription: req.body.richDescription,
+          image: imagePath,
+          brand: req.body.brand,
+          price: Number(req.body.price),
+          category: req.body.category,
+          countInStock: Number(req.body.countInStock),
+          rating: Number(req.body.rating || 0),
+          numReviews: Number(req.body.numReviews || 0),
+          isFeatured:
+            req.body.isFeatured === "true" || req.body.isFeatured === true,
+        },
+        { new: true },
+      );
+
+      return res.status(200).json(updatedProduct);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Product could not be updated", error });
     }
   },
 );
