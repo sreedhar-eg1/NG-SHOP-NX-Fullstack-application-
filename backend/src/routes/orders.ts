@@ -147,4 +147,16 @@ router.get("/get/count", async (_req: Request, res: Response) => {
   return res.status(200).json({ orderCount });
 });
 
+// GET order history for a specific user
+router.get("/get/userorders/:userid", async (req: Request, res: Response) => {
+  const userOrderList = await Order.find({ user: req.params.userid })
+    .populate({
+      path: "orderItem",
+      populate: { path: "product", populate: "category" },
+    })
+    .sort({ dateOrdered: -1 });
+
+  return res.status(200).json(userOrderList);
+});
+
 export default router;
