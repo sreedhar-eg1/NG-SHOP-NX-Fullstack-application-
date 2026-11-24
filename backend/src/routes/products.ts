@@ -156,4 +156,68 @@ router.put(
   },
 );
 
+// PUT upload multiple gallery images
+router.put(
+  "/gallery-images/:id",
+  uploadOptions.array("images"),
+  async (req: Request, res: Response) => {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid Product ID" });
+    }
+
+    const files = req.files as Express.Multer.File[] | undefined;
+    const basePath = `${req.protocol}://${req.get("host")}/public/uploads`;
+    const imagePaths: string[] = files
+      ? files.map((file) => `${basePath}/${file.filename}`)
+      : [];
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        images: imagePaths,
+      },
+      {
+        new: true,
+      },
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.status(200).json(product);
+  },
+);
+
+// DELETE product
+router.delete("/:id", async (req: Request, res: Response) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "Invalid Product ID" });
+  }
+
+  const product = await Product.findByIdAndDelete(req.params.id);
+
+  if (!product) {
+    return res
+      .status(404)
+      .json({ success: false, message: "Product not found" });
+  }
+
+  return res.status(200).json({ success: true, message: "Product deleted" });
+});
+
+// GET product count (Admin Dashboard)
+router.get("/get/count", async (req: Request, res: Response) => {
+  const productCount = await Product.countDocuments();
+  return res.status(200).json({ productCount });
+});
+
+// GET featured products (Storefront Home Page)
+router.get("/get/featured/:count", async (req: Request, res: Response) => {
+  const count = Number(req.params.count) || 0;
+  const products = await Product.find({ isFeatured: true }).limit(count);
+
+  return res.status(200).json(products);
+});
+
 export default router;
