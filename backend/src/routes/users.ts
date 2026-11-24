@@ -114,4 +114,18 @@ router.put("/:id", async (req: Request, res: Response) => {
   return res.status(200).json(user);
 });
 
+// DELETE user
+router.delete("/:id", async (req: Request, res: Response) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "Invalid User ID" });
+  }
+
+  const user = await User.findByIdAndDelete(req.params.id);
+  if (!user) {
+    return res.status(404).json({ success: false, message: "User not found" });
+  }
+
+  return res.status(200).json({ success: true, message: "User deleted" });
+});
+
 export default router;
