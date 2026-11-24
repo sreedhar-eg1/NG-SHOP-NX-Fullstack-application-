@@ -128,4 +128,17 @@ router.delete("/:id", async (req: Request, res: Response) => {
   return res.status(200).json({ success: true, message: "Order deleted" });
 });
 
+// GET total sales revenue (Admin Dashboard)
+router.get("/get/totalsales", async (_req: Request, res: Response) => {
+  const totalSales = await Order.aggregate([
+    { $group: { _id: null, totalSales: { $sum: "$totalPrice" } } },
+  ]);
+
+  if (!totalSales.length) {
+    return res.status(200).json({ totalsales: 0 });
+  }
+
+  return res.status(200).json({ totalsales: totalSales[0].totalsales });
+});
+
 export default router;
