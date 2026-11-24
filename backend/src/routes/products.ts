@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import multer from "multer";
 import { Product } from "../models/product.js";
 import mongoose from "mongoose";
+import { Category } from "../models/category.js";
 
 const router = express.Router();
 
@@ -56,5 +57,48 @@ router.get("/:id", async (req: Request, res: Response) => {
 
   return res.status(200).json(product);
 });
+
+// POST create product with main image
+router.post(
+  "/",
+  uploadOptions.single("image"),
+  async (req: Request, res: Response) => {
+    try {
+      const category = await Category.findById(req.body.category);
+      if (!category) {
+        return res.status(400).json({ message: "Invalid Category" });
+      }
+
+      const file = req.file;
+      if (!file) {
+        return res.status(400).json({ message: "No image in the request" });
+      }
+
+      const basePath = `${req.protocol}://${req.get("host")}/public/uploads`; //http://localhost:3000/public/uploads/phone-1732422660123.jpeg
+
+      let product = new Product({
+        name: req.body.name,
+        description: req.body.description,
+        richDescription: req.body.richDescription,
+        image: `${basePath}/${file.fieldname}`,
+        brand: req.body.brand,
+        price: Number(req.body.price),
+        category: req.body.category,
+        countInStock: Number(req.body.countInStock),
+        rating: Number(req.body.rating || 0),
+        numReviews: Number(req.body.numReviews || 0),
+        isFeatured:
+          req.body.isFeatured === "true" || req.body.isFeatured === true,
+      });
+
+      product = await product.save();
+      return res.status(201).json(product);
+    } catch (error) {
+      return res
+        .status(500)
+        .json({ message: "Product could not be created", error });
+    }
+  },
+);
 
 export default router;
