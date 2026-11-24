@@ -202,8 +202,14 @@ router.delete("/:id", async (req: Request, res: Response) => {
       .status(404)
       .json({ success: false, message: "Product not found" });
   }
-  
+
   return res.status(200).json({ success: true, message: "Product deleted" });
+});
+
+// GET product count (Admin Dashboard)
+router.get("/get/count", async (req: Request, res: Response) => {
+  const productCount = await Product.countDocuments();
+  return res.status(200).json({ productCount });
 });
 
 export default router;
