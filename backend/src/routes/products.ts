@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express";
 import multer from "multer";
 import { Product } from "../models/product.js";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -40,6 +41,20 @@ router.get("/", async (req: Request, res: Response) => {
   } catch (error) {
     return res.status(500).json({ success: false, error });
   }
+});
+
+// GET single product
+router.get("/:id", async (req: Request, res: Response) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "Invalid Product ID" });
+  }
+
+  const product = await Product.findById(req.params.id);
+  if (!product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
+
+  return res.status(200).json(product);
 });
 
 export default router;
