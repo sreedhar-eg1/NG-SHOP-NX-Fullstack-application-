@@ -30,4 +30,21 @@ router.get("/:id", async (req: Request, res: Response) => {
   return res.status(200).json(category);
 });
 
+// POST create category (Admin only via JWT middleware)
+router.post("/", async (req: Request, res: Response) => {
+  try {
+    let category = new Category({
+      name: req.body.name,
+      icon: req.body.icon,
+      color: req.body.color,
+    });
+    category = await category.save();
+    return res.status(201).json(category);
+  } catch (error) {
+    return res
+      .status(400)
+      .json({ message: "Category could not be created", error });
+  }
+});
+
 export default router;
