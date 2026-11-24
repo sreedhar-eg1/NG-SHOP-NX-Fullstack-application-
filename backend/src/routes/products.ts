@@ -156,4 +156,37 @@ router.put(
   },
 );
 
+// PUT upload multiple gallery images
+router.put(
+  "/gallery-images/:id",
+  uploadOptions.array("images"),
+  async (req: Request, res: Response) => {
+    if (!mongoose.isValidObjectId(req.params.id)) {
+      return res.status(400).json({ message: "Invalid Product ID" });
+    }
+
+    const files = req.files as Express.Multer.File[] | undefined;
+    const basePath = `${req.protocol}://${req.get("host")}/public/uploads`;
+    const imagePaths: string[] = files
+      ? files.map((file) => `${basePath}/${file.filename}`)
+      : [];
+
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        images: imagePaths,
+      },
+      {
+        new: true,
+      },
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    return res.status(200).json(product);
+  },
+);
+
 export default router;
