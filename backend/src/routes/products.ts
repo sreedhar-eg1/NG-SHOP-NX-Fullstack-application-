@@ -1,5 +1,6 @@
-import express from "express";
+import express, { Request, Response } from "express";
 import multer from "multer";
+import { Product } from "../models/product.js";
 
 const router = express.Router();
 
@@ -21,6 +22,24 @@ const storage = multer.diskStorage({
     const extension = FILE_TYPE_MAP[file.mimetype];
     callback(null, `${filename}-${Date.now()}.${extension}`);
   },
+});
+
+const uploadOptions = multer({ storage });
+
+// GET all products (supports ?categories=id1,id2 filter)
+router.get("/", async (req: Request, res: Response) => {
+  try {
+    let filter: Record<string, unknown> = {};
+
+    if (req.query.categories && typeof req.query.categories === "string") {
+      filter = { category: { $in: req.query.categories.split(",") } };
+    }
+
+    const productList = await Product.find(filter).populate("category");
+    return res.status(200).json(productList);
+  } catch (error) {
+    return res.status(500).json({ success: false, error });
+  }
 });
 
 export default router;
