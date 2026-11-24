@@ -54,5 +54,3 @@ mongoose
     });
   })
   .catch((err) => console.error("MongoDB connection error:", err));
-
-app.listen(process.env.PORT);
