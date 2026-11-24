@@ -110,4 +110,22 @@ router.put("/:id", async (req: Request, res: Response) => {
   return res.status(200).json(order);
 });
 
+// DELETE order & clean up orphaned OrderItems
+router.delete("/:id", async (req: Request, res: Response) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "Invalid Order ID" });
+  }
+
+  const order = await Order.findByIdAndDelete(req.params.id);
+  if (!order) {
+    return res.status(404).json({ success: false, message: "Order not found" });
+  }
+
+  await Promise.all(
+    order.orderItems.map((orderItemId) => Order.findByIdAndDelete(orderItemId)),
+  );
+
+  return res.status(200).json({ success: true, message: "Order deleted" });
+});
+
 export default router;
