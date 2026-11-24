@@ -1,8 +1,9 @@
 import express, { Request, Response } from "express";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
 
 import { User } from "../models/user.js";
-import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
@@ -45,6 +46,38 @@ router.post("/register", async (req: Request, res: Response) => {
     return res.status(201).json(userObj);
   } catch (error) {
     return res.status(400).json({ message: "User registration failed", error });
+  }
+});
+
+// POST login & return JWT
+router.post("/login", async (req: Request, res: Response) => {
+  const user = await User.findOne({ email: req.body.email });
+  const secret = process.env.SECRET as string;
+
+  if (!user) {
+    return res.status(400).json({ message: "User not found" });
+  }
+
+  if (bcrypt.compareSync(req.body.password, user.passwordHash)) {
+    const token = jwt.sign(
+      {
+        userId: user.id,
+        isAdmin: user.isAdmin,
+      },
+      secret,
+      { expiresIn: "1d" },
+    );
+
+    return res
+      .status(200)
+      .json({
+        user: user.email,
+        userId: user.id,
+        isAdmin: user.isAdmin,
+        token,
+      });
+  } else {
+    return res.status(400).json({ message: "Invalid email or password" });
   }
 });
 
