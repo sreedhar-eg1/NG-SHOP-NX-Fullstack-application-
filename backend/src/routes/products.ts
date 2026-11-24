@@ -212,4 +212,12 @@ router.get("/get/count", async (req: Request, res: Response) => {
   return res.status(200).json({ productCount });
 });
 
+// GET featured products (Storefront Home Page)
+router.get("/get/featured/:count", async (req: Request, res: Response) => {
+  const count = Number(req.params.count) || 0;
+  const products = await Product.find({ isFeatured: true }).limit(count);
+
+  return res.status(200).json(products);
+});
+
 export default router;
