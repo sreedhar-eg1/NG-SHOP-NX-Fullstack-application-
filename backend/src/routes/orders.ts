@@ -90,4 +90,24 @@ router.post("/", async (req: Request, res: Response) => {
   }
 });
 
+// PUT update order status (Admin)
+router.put("/:id", async (req: Request, res: Response) => {
+  if (!mongoose.isValidObjectId(req.params.id)) {
+    return res.status(400).json({ message: "Invalid Order ID" });
+  }
+
+  const order = await Order.findByIdAndUpdate(
+    req.params.id,
+    {
+      status: req.body.status,
+    },
+    { new: true },
+  );
+  if (!order) {
+    return res.status(404).json({ message: "Order not found" });
+  }
+
+  return res.status(200).json(order);
+});
+
 export default router;
