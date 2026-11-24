@@ -128,4 +128,10 @@ router.delete("/:id", async (req: Request, res: Response) => {
   return res.status(200).json({ success: true, message: "User deleted" });
 });
 
+// GET user count (Admin Dashboard)
+router.get("/get/count", async (_req: Request, res: Response) => {
+  const userCount = await User.countDocuments();
+  return res.status(200).json({ userCount });
+});
+
 export default router;
