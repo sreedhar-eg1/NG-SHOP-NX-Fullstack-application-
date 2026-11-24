@@ -10,7 +10,7 @@ import { authJwt } from "./helpers/jwt.js";
 import { errorHandler } from "./helpers/error-handler.js";
 import categoriesRoute from "./routes/categories.js";
 import productsRoutes from "./routes/products.js";
-// import usersRoutes from "./routes/users.js";
+import usersRoutes from "./routes/users.js";
 // import ordersRoutes from "./routes/orders.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,7 +32,7 @@ app.use(
 // Routes
 app.use(`${api}/categories`, categoriesRoute);
 app.use(`${api}/products`, productsRoutes);
-// app.use(`${api}/users`, usersRoutes);
+app.use(`${api}/users`, usersRoutes);
 // app.use(`${api}/orders`, ordersRoutes);
 
 // Global Error Handler
