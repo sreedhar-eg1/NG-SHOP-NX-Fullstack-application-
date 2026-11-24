@@ -141,4 +141,10 @@ router.get("/get/totalsales", async (_req: Request, res: Response) => {
   return res.status(200).json({ totalsales: totalSales[0].totalsales });
 });
 
+// GET total order count (Admin Dashboard)
+router.get("/get/count", async (_req: Request, res: Response) => {
+  const orderCount = await Order.countDocuments();
+  return res.status(200).json({ orderCount });
+});
+
 export default router;
