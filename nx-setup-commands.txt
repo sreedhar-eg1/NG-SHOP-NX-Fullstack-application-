@@ -1,0 +1,38 @@
+Nx Workspace Initial Setup CLI Commands
+1. Create the Nx Angular Monorepo
+npx create-nx-workspace@latest frontend --preset=angular-monorepo --appName=eshop --bundler=esbuild --style=scss --ssr=false --routing=true --standalone=true --nxCloud=skip Creates a new Nx monorepo in the frontend folder with an initial eshop Angular app using esbuild, SCSS, routing, standalone components, no SSR, and no Nx Cloud.
+
+cd frontend Moves into the Nx workspace root. All subsequent nx commands must be run from here.
+
+2. Generate Additional Apps
+npx nx g @nx/angular:application apps/admin --bundler=esbuild --style=scss --ssr=false --routing=true --standalone=true Adds a second Angular application such as an admin dashboard inside apps/admin.
+
+3. Generate Shared Libraries
+npx nx g @nx/angular:library libs/products --unitTestRunner=none Creates a non-buildable standalone library for products without a test runner, avoiding the vitest-angular buildable requirement.
+
+npx nx g @nx/angular:library libs/orders --unitTestRunner=none Creates a shared library for orders.
+
+npx nx g @nx/angular:library libs/users --unitTestRunner=none Creates a shared library for users and authentication.
+
+npx nx g @nx/angular:library libs/ui --unitTestRunner=none Creates a shared UI components library.
+
+npx nx g @nx/angular:library libs/products --buildable=true --unitTestRunner=vitest-angular Alternative command if you want the library to be buildable and tested with vitest-angular.
+
+4. Generate Components and Services
+npx nx g @nx/angular:component libs/products/src/lib/product-list/product-list --export=true Generates a standalone component inside a library and exports it from the library index.ts so apps can import it.
+
+npx nx g @nx/angular:service libs/products/src/lib/services/products Generates an Angular injectable service inside a library.
+
+5. Run, Build, and Inspect
+npx nx serve eshop Starts the local development server for the eshop app.
+
+npx nx build eshop Compiles the eshop app for production into the dist folder.
+
+npx nx test eshop Runs unit tests for the eshop app.
+
+npx nx graph Opens the interactive workspace dependency graph in your browser.
+
+6. Troubleshooting Commands
+npm cache clean --force Clears the local npm cache if workspace creation fails with ETARGET errors.
+
+npx nx reset Clears Nx's local computation cache and stops the Nx daemon if builds or generators behave unexpectedly.
