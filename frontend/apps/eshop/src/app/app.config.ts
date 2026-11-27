@@ -3,10 +3,10 @@ import {
   isDevMode,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { appRoutes } from './app.routes';
 
-import { provideStore } from '@ngrx/store';
+import { provideState, provideStore } from '@ngrx/store';
 import { provideEffects } from '@ngrx/effects';
 import { provideRouterStore, routerReducer } from '@ngrx/router-store';
 import { provideStoreDevtools } from '@ngrx/store-devtools';
@@ -16,17 +16,15 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 
+import { AuthEffects, authFeature, jwtInterceptor } from '@frontend/users';
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(appRoutes),
+    provideRouter(appRoutes, withComponentInputBinding()),
 
-    provideHttpClient(
-      withInterceptors([
-        // We will add jwtInterceptor here in Module 3
-      ]),
-    ),
-    
+    provideHttpClient(withInterceptors([jwtInterceptor])),
+
     providePrimeNG({
       theme: {
         preset: Aura,
@@ -40,7 +38,8 @@ export const appConfig: ApplicationConfig = {
     provideStore({
       router: routerReducer,
     }),
-    provideEffects([]),
+    provideState(authFeature),
+    provideEffects([AuthEffects]),
     provideRouterStore(),
     provideStoreDevtools({
       maxAge: 25,
