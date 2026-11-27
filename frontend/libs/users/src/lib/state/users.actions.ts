@@ -2,7 +2,7 @@ import { createActionGroup, emptyProps, props } from '@ngrx/store';
 
 import { User } from '../models/user.model';
 
-export const UserActions = createActionGroup({
+export const UsersActions = createActionGroup({
   source: 'Users API',
   events: {
     'Load Users': emptyProps(),
