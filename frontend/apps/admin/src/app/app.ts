@@ -3,8 +3,9 @@ import { RouterModule } from '@angular/router';
 
 import { Store } from '@ngrx/store';
 
-import { NxWelcome } from './nx-welcome';
 import { AuthAction } from '@frontend/users';
+
+import { NxWelcome } from './nx-welcome';
 
 @Component({
   imports: [NxWelcome, RouterModule],
@@ -13,9 +14,9 @@ import { AuthAction } from '@frontend/users';
   styleUrl: './app.scss',
 })
 export class App implements OnInit {
-  private store = inject(Store)
+  private store = inject(Store);
 
   ngOnInit(): void {
-      this.store.dispatch(AuthAction.buildUserSession())
+    this.store.dispatch(AuthAction.buildUserSession());
   }
 }

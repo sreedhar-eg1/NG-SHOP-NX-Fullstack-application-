@@ -37,9 +37,9 @@ export const appConfig: ApplicationConfig = {
     provideStore({
       router: routerReducer,
     }),
+    provideState(authFeature),
     provideEffects([AuthEffects]),
     provideRouterStore(),
-    provideState(authFeature),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: !isDevMode(),
