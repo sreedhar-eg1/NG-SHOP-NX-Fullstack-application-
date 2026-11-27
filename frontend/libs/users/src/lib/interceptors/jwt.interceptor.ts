@@ -17,7 +17,7 @@ export const jwtInterceptor: HttpInterceptorFn = (req, next) => {
 
   // Read token synchronously via NgRx Signal selector (with localStorage fallback on bootstrap)
   const token =
-    store.selectSignal(authFeature.selectToken) || localStorage.getToken();
+    store.selectSignal(authFeature.selectToken)() || localStorage.getToken();
   const isApiUrl = environment.apiUrl;
 
   if (token && isApiUrl) {
