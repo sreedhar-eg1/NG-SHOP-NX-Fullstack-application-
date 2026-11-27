@@ -1,6 +1,6 @@
 import { createFeature, createReducer, createSelector, on } from '@ngrx/store';
 
-import { authAction } from './auth.actions';
+import { AuthAction } from './auth.actions';
 
 export interface AuthState {
   userId: string | null;
@@ -25,7 +25,7 @@ export const authFeature = createFeature({
   reducer: createReducer(
     initialState,
     on(
-      authAction.buildUserSessionSuccess,
+      AuthAction.buildUserSessionSuccess,
       (state, { userId, isAdmin, token }) => ({
         ...state,
         userId,
@@ -33,14 +33,14 @@ export const authFeature = createFeature({
         token,
       }),
     ),
-    on(authAction.buildUserSessionFailure, () => initialState),
+    on(AuthAction.buildUserSessionFailure, () => initialState),
 
-    on(authAction.login, (state) => ({
+    on(AuthAction.login, (state) => ({
       ...state,
       loading: true,
       error: null,
     })),
-    on(authAction.loginSuccess, (state, { response }) => ({
+    on(AuthAction.loginSuccess, (state, { response }) => ({
       ...state,
       userId: response.userId,
       email: response.user,
@@ -49,12 +49,12 @@ export const authFeature = createFeature({
       loading: false,
       error: null,
     })),
-    on(authAction.loginFailure, (state, { error }) => ({
+    on(AuthAction.loginFailure, (state, { error }) => ({
       ...state,
       loading: false,
       error,
     })),
-    on(authAction.logout, () => initialState),
+    on(AuthAction.logout, () => initialState),
   ),
   extraSelectors: ({ selectToken }) => ({
     selectIsAuthenticated: createSelector(selectToken, (token) => !!token),
