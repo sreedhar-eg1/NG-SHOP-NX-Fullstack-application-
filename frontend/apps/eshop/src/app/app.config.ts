@@ -3,7 +3,7 @@ import {
   isDevMode,
   provideBrowserGlobalErrorListeners,
 } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, withComponentInputBinding } from '@angular/router';
 import { appRoutes } from './app.routes';
 
 import { provideState, provideStore } from '@ngrx/store';
@@ -21,7 +21,7 @@ import { AuthEffects, authFeature, jwtInterceptor } from '@frontend/users';
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideRouter(appRoutes),
+    provideRouter(appRoutes, withComponentInputBinding()),
 
     provideHttpClient(withInterceptors([jwtInterceptor])),
 
