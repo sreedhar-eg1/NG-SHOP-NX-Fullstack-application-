@@ -7,7 +7,7 @@ import { AuthService } from '../services/auth.service';
 import { LocalStorageService } from '../services/localstorage.service';
 
 import { authAction } from './auth.actions';
-import { catchError, exhaustMap, map, of } from 'rxjs';
+import { catchError, exhaustMap, map, of, tap } from 'rxjs';
 
 @Injectable()
 export class AuthEffects {
@@ -54,5 +54,17 @@ export class AuthEffects {
         ),
       ),
     ),
+  );
+
+  loginSuccess$ = createEffect(
+    () =>
+      this.actions$.pipe(
+        ofType(authAction.loginSuccess),
+        tap(({ response, redirectUrl }) => {
+          this.localStorage.setToken(response.token);
+          this.router.navigateByUrl(redirectUrl || '/');
+        }),
+      ),
+    { dispatch: false },
   );
 }
