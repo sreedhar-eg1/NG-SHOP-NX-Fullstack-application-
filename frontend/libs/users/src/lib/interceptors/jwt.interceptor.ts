@@ -1,7 +1,5 @@
 import {
-  HttpHandlerFn,
   HttpInterceptorFn,
-  HttpRequest,
 } from '@angular/common/http';
 import { inject } from '@angular/core';
 
