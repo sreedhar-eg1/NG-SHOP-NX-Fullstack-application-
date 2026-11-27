@@ -2,7 +2,7 @@ import { createActionGroup, emptyProps, props } from '@ngrx/store';
 
 import { LoginResponse } from '../models/user.model';
 
-export const authAction = createActionGroup({
+export const AuthAction = createActionGroup({
   source: 'Auth',
   events: {
     'Build User Session': emptyProps(),

@@ -6,7 +6,7 @@ import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { AuthService } from '../services/auth.service';
 import { LocalStorageService } from '../services/localstorage.service';
 
-import { authAction } from './auth.actions';
+import { AuthAction } from './auth.actions';
 import { catchError, exhaustMap, map, of, tap } from 'rxjs';
 
 @Injectable()
@@ -18,14 +18,14 @@ export class AuthEffects {
 
   buildUserSession$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(authAction.buildUserSession),
+      ofType(AuthAction.buildUserSession),
       map(() => {
         if (this.localStorage.isValidToken()) {
           const decoded = this.localStorage.decodeToken();
           const token = this.localStorage.getToken();
 
           if (decoded && token) {
-            return authAction.buildUserSessionSuccess({
+            return AuthAction.buildUserSessionSuccess({
               userId: decoded.userId,
               isAdmin: decoded.isAdmin,
               token,
@@ -33,20 +33,20 @@ export class AuthEffects {
           }
         }
 
-        return authAction.buildUserSessionFailure();
+        return AuthAction.buildUserSessionFailure();
       }),
     ),
   );
 
   login$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(authAction.login),
+      ofType(AuthAction.login),
       exhaustMap(({ email, password, redirectUrl }) =>
         this.authService.login(email, password).pipe(
-          map((response) => authAction.loginSuccess({ response, redirectUrl })),
+          map((response) => AuthAction.loginSuccess({ response, redirectUrl })),
           catchError((err) =>
             of(
-              authAction.loginFailure({
+              AuthAction.loginFailure({
                 error: err?.error?.message || 'Login failed',
               }),
             ),
@@ -59,7 +59,7 @@ export class AuthEffects {
   loginSuccess$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(authAction.loginSuccess),
+        ofType(AuthAction.loginSuccess),
         tap(({ response, redirectUrl }) => {
           this.localStorage.setToken(response.token);
           this.router.navigateByUrl(redirectUrl || '/');
@@ -71,7 +71,7 @@ export class AuthEffects {
   logout$ = createEffect(
     () =>
       this.actions$.pipe(
-        ofType(authAction.logout),
+        ofType(AuthAction.logout),
         tap(() => {
           this.localStorage.removeToken();
           this.router.navigate(['/login']);
