@@ -35,7 +35,31 @@ export class UsersEffects {
         this.usersService.createUser(user).pipe(
           map((user) => UsersActions.createUserSuccess({ user })),
           catchError((err) =>
-            of(UsersActions.createUserFailure({ error: err })),
+            of(
+              UsersActions.createUserFailure({
+                error: err?.message || 'Failed to create user.',
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  updateUser$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UsersActions.createUser),
+      concatMap(({ user }) =>
+        this.usersService.updateUser(user).pipe(
+          map((updatedUser) =>
+            UsersActions.updateUserSuccess({ user: updatedUser }),
+          ),
+          catchError((err) =>
+            of(
+              UsersActions.updateUserFailure({
+                error: err?.message || 'Failed to update user.',
+              }),
+            ),
           ),
         ),
       ),
