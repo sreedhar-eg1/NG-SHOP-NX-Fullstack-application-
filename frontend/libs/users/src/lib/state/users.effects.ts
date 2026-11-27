@@ -65,4 +65,24 @@ export class UsersEffects {
       ),
     ),
   );
+
+  deleteUser$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UsersActions.deleteUser),
+      concatMap(({ userId }) =>
+        this.usersService.deleteUser(userId).pipe(
+          map((userId) =>
+            UsersActions.deleteUserSuccess({ userId: userId as string }),
+          ),
+          catchError((err) =>
+            of(
+              UsersActions.deleteUserFailure({
+                error: err?.message || 'Failed to delete user.',
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
