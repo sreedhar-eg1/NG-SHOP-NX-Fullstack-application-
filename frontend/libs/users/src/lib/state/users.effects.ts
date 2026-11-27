@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { UsersService } from '../services/users.service';
 import { UsersActions } from './users.actions';
-import { catchError, map, of, switchMap } from 'rxjs';
+import { catchError, concatMap, map, of, switchMap } from 'rxjs';
 
 @Injectable()
 export class UsersEffects {
@@ -20,6 +20,64 @@ export class UsersEffects {
             of(
               UsersActions.loadUsersFailure({
                 error: err?.error?.message || 'Failed to load users.',
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  createUser$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UsersActions.createUser),
+      concatMap(({ user }) =>
+        this.usersService.createUser(user).pipe(
+          map((user) => UsersActions.createUserSuccess({ user })),
+          catchError((err) =>
+            of(
+              UsersActions.createUserFailure({
+                error: err?.message || 'Failed to create user.',
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  updateUser$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UsersActions.createUser),
+      concatMap(({ user }) =>
+        this.usersService.updateUser(user).pipe(
+          map((updatedUser) =>
+            UsersActions.updateUserSuccess({ user: updatedUser }),
+          ),
+          catchError((err) =>
+            of(
+              UsersActions.updateUserFailure({
+                error: err?.message || 'Failed to update user.',
+              }),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
+  deleteUser$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UsersActions.deleteUser),
+      concatMap(({ userId }) =>
+        this.usersService.deleteUser(userId).pipe(
+          map((userId) =>
+            UsersActions.deleteUserSuccess({ userId: userId as string }),
+          ),
+          catchError((err) =>
+            of(
+              UsersActions.deleteUserFailure({
+                error: err?.message || 'Failed to delete user.',
               }),
             ),
           ),
