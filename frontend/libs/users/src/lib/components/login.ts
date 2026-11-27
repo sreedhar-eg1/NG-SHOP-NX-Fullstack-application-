@@ -16,7 +16,7 @@ import { AuthAction } from '../state/auth.actions';
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
-export class Login {
+export class LoginComponent {
   private fb = inject(FormBuilder);
   private store = inject(Store);
 
